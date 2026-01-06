@@ -306,6 +306,8 @@ func _on_hitbox_hit(target: Node3D) -> void:
 		GameState.add_combo(1)
 		combo_decay_timer = GameState.combo_decay_time
 		
+		# Spawn hit effect
+		EffectManager.spawn_hit_effect(target.global_position + Vector3.UP)
 		AudioManager.play_sfx("hit_enemy")
 		attack_hit.emit(target)
 

@@ -41,6 +41,7 @@ var camera_rotation_x: float = 0.0
 
 
 func _ready() -> void:
+	add_to_group("player")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	# Set up collision layers
@@ -51,6 +52,7 @@ func _ready() -> void:
 	hitbox.collision_layer = 8  # PlayerHitbox layer
 	hitbox.collision_mask = 4  # Enemy layer
 	hitbox.deactivate()
+	hitbox.hit_detected.connect(_on_hitbox_hit_detected)
 	
 	# Connect to game state signals
 	GameState.player_died.connect(_on_player_died)

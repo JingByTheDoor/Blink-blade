@@ -14,8 +14,14 @@ signal room_completed()
 
 var player_instance: Node3D = null
 var room_active: bool = false
+var hud_instance: CanvasLayer = null
+var pause_menu_instance: CanvasLayer = null
+var upgrade_screen_instance: Control = null
 
 const PLAYER_SCENE = preload("res://scenes/player/player.tscn")
+const HUD_SCENE = preload("res://scenes/ui/hud.tscn")
+const PAUSE_MENU_SCENE = preload("res://scenes/ui/pause_menu.tscn")
+const UPGRADE_SCREEN_SCENE = preload("res://scenes/ui/upgrade_screen.tscn")
 
 
 func _ready() -> void:
@@ -23,6 +29,7 @@ func _ready() -> void:
 		game_manager.all_enemies_defeated.connect(_on_all_enemies_defeated)
 	
 	_spawn_player()
+	_setup_ui()
 	
 	if auto_start:
 		start_room()
@@ -36,6 +43,20 @@ func _spawn_player() -> void:
 		player_instance.global_position = player_spawn.global_position
 	else:
 		player_instance.global_position = Vector3(0, 1, 0)
+
+
+func _setup_ui() -> void:
+	# Add HUD
+	hud_instance = HUD_SCENE.instantiate()
+	add_child(hud_instance)
+	
+	# Add Pause Menu
+	pause_menu_instance = PAUSE_MENU_SCENE.instantiate()
+	add_child(pause_menu_instance)
+	
+	# Add Upgrade Screen
+	upgrade_screen_instance = UPGRADE_SCREEN_SCENE.instantiate()
+	add_child(upgrade_screen_instance)
 
 
 func start_room() -> void:

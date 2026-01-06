@@ -163,6 +163,15 @@ func on_room_cleared() -> void:
 
 func show_upgrade_selection() -> void:
 	upgrade_selection_started.emit()
+	# Load upgrade screen asynchronously to avoid blocking
+	call_deferred("_load_upgrade_screen")
+
+
+func _load_upgrade_screen() -> void:
+	var upgrade_scene = load("res://scenes/ui/upgrade_screen.tscn")
+	if upgrade_scene:
+		var upgrade_screen = upgrade_scene.instantiate()
+		get_tree().root.add_child(upgrade_screen)
 
 
 func advance_to_next_room() -> void:

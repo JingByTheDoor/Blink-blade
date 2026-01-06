@@ -19,6 +19,19 @@ func _ready() -> void:
 	for spawn_data in enemy_spawns:
 		if spawn_data.wave_group > max_wave:
 			max_wave = spawn_data.wave_group
+	
+	# Find and register any pre-placed enemies in the scene
+	await get_tree().process_frame
+	_register_existing_enemies()
+
+
+func _register_existing_enemies() -> void:
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if enemy not in active_enemies:
+			active_enemies.append(enemy)
+			if enemy.has_signal("died"):
+				enemy.died.connect(_on_enemy_died.bind(enemy))
 
 
 func start_room() -> void:

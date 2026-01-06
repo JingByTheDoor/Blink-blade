@@ -1,6 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://dlo78i1vekp8k"]
+[gd_scene load_steps=5 format=3 uid="uid://dlo78i1vekp8k"]
 
 [ext_resource type="Script" path="res://scenes/effects/blink_effect.gd" id="1_blink"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_blink"]
+radius = 0.1
+height = 0.2
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_blink"]
 emission_shape = 1
@@ -29,4 +33,4 @@ lifetime = 0.8
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_blink")
-draw_pass_1 = SubResource("StandardMaterial3D_blink")
+draw_pass_1 = SubResource("SphereMesh_blink")

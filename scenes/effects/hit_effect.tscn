@@ -1,4 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://c0uxrjnwgp6yv"]
+[gd_scene load_steps=5 format=3 uid="uid://c0uxrjnwgp6yv"]
+
+[ext_resource type="Script" path="res://scenes/effects/hit_effect.gd" id="1_hit"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_hit"]
+radius = 0.05
+height = 0.1
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hit"]
 emission_shape = 1
@@ -18,10 +24,11 @@ shading_mode = 0
 albedo_color = Color(1, 0.5, 0, 1)
 
 [node name="HitEffect" type="GPUParticles3D"]
+script = ExtResource("1_hit")
 emitting = false
 amount = 16
 lifetime = 0.5
 one_shot = true
 explosiveness = 1.0
 process_material = SubResource("ParticleProcessMaterial_hit")
-draw_pass_1 = SubResource("StandardMaterial3D_hit")
+draw_pass_1 = SubResource("SphereMesh_hit")

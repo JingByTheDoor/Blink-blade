@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://csxdpr7yy6jg5"]
+[gd_scene load_steps=6 format=3 uid="uid://csxdpr7yy6jg5"]
 
 [ext_resource type="Script" path="res://scenes/rooms/room_base.gd" id="1_room"]
+[ext_resource type="PackedScene" uid="uid://c4h6kpj6nwjqp" path="res://scenes/ui/hud.tscn" id="2_hud"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_floor"]
 size = Vector3(20, 0.5, 20)
@@ -85,3 +86,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -2)
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 0)
 shadow_enabled = true
+
+[node name="HUD" parent="." instance=ExtResource("2_hud")]
+

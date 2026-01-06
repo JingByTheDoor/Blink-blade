@@ -21,6 +21,7 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/autoload/game_state.gd"
 UpgradeManager="*res://scripts/autoload/upgrade_manager.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
+EffectManager="*res://scripts/autoload/effect_manager.gd"
 
 [display]
 

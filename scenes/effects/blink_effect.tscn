@@ -1,0 +1,35 @@
+[gd_scene load_steps=4 format=3 uid="uid://blinkfx123"]
+
+[ext_resource type="Script" path="res://scenes/effects/blink_effect.gd" id="1_blink"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
+emission_shape = 1
+emission_sphere_radius = 0.5
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 2.0
+initial_velocity_max = 4.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.1
+scale_max = 0.3
+color = Color(0, 0.8, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1"]
+radius = 0.05
+height = 0.1
+
+[node name="BlinkEffect" type="Node3D"]
+script = ExtResource("1_blink")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+amount = 30
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_1")
+draw_pass_1 = SubResource("SphereMesh_1")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(0, 0.8, 1, 1)
+light_energy = 3.0
+omni_range = 5.0

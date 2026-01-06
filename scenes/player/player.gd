@@ -201,6 +201,9 @@ func _perform_blink() -> void:
 	is_blinking = true
 	blink_cooldown_timer = GameState.blink_cooldown
 	
+	# Spawn effect at start position
+	EffectManager.spawn_blink_effect(global_position)
+	
 	# Calculate position behind target
 	var target_pos = blink_target.global_position
 	var dir_to_target = (target_pos - global_position).normalized()
@@ -213,6 +216,9 @@ func _perform_blink() -> void:
 	# Teleport
 	global_position = blink_position
 	look_at(target_pos, Vector3.UP)
+	
+	# Spawn effect at end position
+	EffectManager.spawn_blink_effect(global_position)
 	
 	AudioManager.play_sfx("blink")
 	blink_performed.emit(blink_target)
@@ -240,6 +246,7 @@ func _perform_dash() -> void:
 	dash_timer = DASH_DURATION
 	dash_cooldown_timer = GameState.dash_cooldown
 	
+	EffectManager.spawn_dash_effect(global_position, dash_direction)
 	AudioManager.play_sfx("dash")
 	dash_performed.emit()
 

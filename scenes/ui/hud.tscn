@@ -74,18 +74,64 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -80.0
-offset_right = 100.0
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_constants/separation = 20
+theme_override_constants/separation = 30
 alignment = 1
 
-[node name="BlinkCooldown" type="TextureProgressBar" parent="AbilityContainer"]
-custom_minimum_size = Vector2(60, 60)
+[node name="BlinkCooldown" type="ProgressBar" parent="AbilityContainer"]
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
+max_value = 2.0
+value = 2.0
+show_percentage = false
 
-[node name="DashCooldown" type="TextureProgressBar" parent="AbilityContainer"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Label" type="Label" parent="AbilityContainer/BlinkCooldown"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "RMB"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title" type="Label" parent="AbilityContainer/BlinkCooldown"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = -20.0
+grow_horizontal = 2
+text = "BLINK"
+horizontal_alignment = 1
+
+[node name="DashCooldown" type="ProgressBar" parent="AbilityContainer"]
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
+max_value = 1.5
+value = 1.5
+show_percentage = false
+
+[node name="Label" type="Label" parent="AbilityContainer/DashCooldown"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "SHIFT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title" type="Label" parent="AbilityContainer/DashCooldown"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = -20.0
+grow_horizontal = 2
+text = "DASH"
+horizontal_alignment = 1

@@ -14,10 +14,8 @@ func _ready() -> void:
 
 
 func _on_area_entered(area: Area3D) -> void:
-	# Check if this is a hitbox
-	if area is Hitbox:
-		var hitbox: Hitbox = area as Hitbox
-		if hitbox.is_active and owner_node:
-			# Let the hitbox handle the damage calculation
-			# The owner should have a take_damage method
-			pass
+	# The hitbox itself handles damage dealing
+	# This hurtbox is just for collision detection
+	# The actual damage is handled by the Hitbox's _process_hit method
+	# which calls take_damage on the owner/parent node
+	pass

@@ -184,7 +184,8 @@ func _perform_attack() -> void:
 	can_combo = true
 	
 	# Attack duration
-	await get_tree().create_timer(ATTACK_DURATION).timeout
+	if get_tree():
+		await get_tree().create_timer(ATTACK_DURATION).timeout
 	hitbox.deactivate()
 	is_attacking = false
 	attack_cooldown_timer = ATTACK_COOLDOWN
@@ -321,7 +322,7 @@ func take_damage(amount: int) -> void:
 
 
 func _flash_damage() -> void:
-	if mesh and mesh.get_surface_override_material(0):
+	if mesh and mesh.get_surface_override_material(0) and get_tree():
 		var mat = mesh.get_surface_override_material(0) as StandardMaterial3D
 		if mat:
 			var original_color = mat.albedo_color

@@ -100,7 +100,8 @@ func _perform_attack() -> void:
 				target.take_damage(attack_damage)
 	
 	# Attack animation duration
-	await get_tree().create_timer(0.5).timeout
+	if get_tree():
+		await get_tree().create_timer(0.5).timeout
 	is_attacking = false
 
 
@@ -127,7 +128,7 @@ func take_damage(amount: int, knockback: Vector3 = Vector3.ZERO) -> void:
 
 
 func _flash_hit() -> void:
-	if mesh:
+	if mesh and get_tree():
 		var mat = mesh.get_active_material(0)
 		if mat is StandardMaterial3D:
 			var original_color = mat.albedo_color

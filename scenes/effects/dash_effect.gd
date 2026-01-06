@@ -14,5 +14,7 @@ func _ready() -> void:
 			tween.tween_property(mat, "albedo_color:a", 0.0, 0.3)
 	
 	# Self destruct
-	await get_tree().create_timer(0.5).timeout
-	queue_free()
+	if get_tree():
+		await get_tree().create_timer(0.5).timeout
+	if is_instance_valid(self):
+		queue_free()

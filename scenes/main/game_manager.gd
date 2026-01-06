@@ -47,7 +47,7 @@ func spawn_wave(wave_number: int) -> void:
 	
 	for spawn_data in enemy_spawns:
 		if spawn_data.wave_group == wave_number:
-			if spawn_data.spawn_delay > 0:
+			if spawn_data.spawn_delay > 0 and get_tree():
 				await get_tree().create_timer(spawn_data.spawn_delay).timeout
 			spawn_enemy(spawn_data)
 

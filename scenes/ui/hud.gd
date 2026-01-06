@@ -82,14 +82,16 @@ func _update_room_display() -> void:
 
 
 func _flash_combo_break() -> void:
-	if combo_counter:
+	if combo_counter and get_tree():
 		combo_counter.add_theme_color_override("font_color", Color.RED)
 		await get_tree().create_timer(0.3).timeout
-		combo_counter.remove_theme_color_override("font_color")
+		if is_instance_valid(combo_counter):
+			combo_counter.remove_theme_color_override("font_color")
 
 
 func _flash_milestone(milestone: int) -> void:
-	if combo_counter:
+	if combo_counter and get_tree():
 		combo_counter.add_theme_color_override("font_color", Color.GOLD)
 		await get_tree().create_timer(0.5).timeout
-		combo_counter.remove_theme_color_override("font_color")
+		if is_instance_valid(combo_counter):
+			combo_counter.remove_theme_color_override("font_color")

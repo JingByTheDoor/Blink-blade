@@ -16,8 +16,10 @@ func _ready() -> void:
 		tween.tween_property(light, "light_energy", 0.0, 0.3)
 	
 	# Self destruct
-	await get_tree().create_timer(1.0).timeout
-	queue_free()
+	if get_tree():
+		await get_tree().create_timer(1.0).timeout
+	if is_instance_valid(self):
+		queue_free()
 
 
 func play_at(position: Vector3) -> void:

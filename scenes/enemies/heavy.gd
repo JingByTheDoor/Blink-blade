@@ -16,9 +16,11 @@ func _perform_attack() -> void:
 	attack_timer = attack_cooldown
 	
 	# Wind-up before attack (telegraphing)
+	if not get_tree():
+		return
 	await get_tree().create_timer(0.5).timeout
 	
-	if is_dead:
+	if is_dead or not is_instance_valid(self):
 		return
 	
 	# Heavy slam attack
@@ -29,5 +31,6 @@ func _perform_attack() -> void:
 				target.take_damage(attack_damage)
 				AudioManager.play_sfx("hit_player")
 	
-	await get_tree().create_timer(0.5).timeout
+	if get_tree():
+		await get_tree().create_timer(0.5).timeout
 	is_attacking = false

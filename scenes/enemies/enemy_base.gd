@@ -104,15 +104,17 @@ func _perform_attack() -> void:
 	is_attacking = false
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, knockback: Vector3 = Vector3.ZERO) -> void:
 	if is_dead:
 		return
 	
 	current_health -= amount
 	hit_taken.emit(amount)
 	
-	# Knockback
-	if target:
+	# Apply knockback
+	if knockback.length() > 0.1:
+		knockback_velocity = knockback
+	elif target:
 		var knockback_dir = (global_position - target.global_position).normalized()
 		knockback_velocity = knockback_dir * 5.0
 	

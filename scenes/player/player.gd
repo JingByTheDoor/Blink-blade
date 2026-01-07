@@ -54,6 +54,7 @@ const DASH_DURATION: float = 0.2
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	add_to_group("player")
 	hitbox.hit_detected.connect(_on_hitbox_hit)
 	
 	# Initialize from GameState

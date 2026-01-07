@@ -9,7 +9,7 @@ signal hit_taken(damage: int)
 @export var move_speed: float = 4.0
 @export var attack_damage: int = 20
 @export var attack_range: float = 2.0
-@export var detection_range: float = 20.0
+@export var detection_range: float = 12.0
 @export var attack_cooldown: float = 1.5
 
 @onready var mesh: MeshInstance3D = $Mesh
@@ -42,6 +42,9 @@ func _find_player() -> void:
 func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
+	
+	if not target or not is_instance_valid(target):
+		_find_player()
 	
 	# Apply gravity
 	if not is_on_floor():

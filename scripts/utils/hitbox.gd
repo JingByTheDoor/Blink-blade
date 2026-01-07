@@ -5,7 +5,7 @@ class_name Hitbox
 signal hit_detected(target: Node3D)
 
 @export var damage: int = 10
-@export var knockback_force: float = 5.0
+@export var knockback_force: float = 8.0
 
 var is_active: bool = false
 var hit_targets: Array[Node3D] = []

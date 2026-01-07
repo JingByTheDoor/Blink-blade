@@ -31,6 +31,9 @@ const CAMERA_MAX_ANGLE: float = 70.0
 const COMBO_WINDOW: float = 0.5
 const ATTACK_DURATION: float = 0.3
 const ATTACK_COOLDOWN: float = 0.1
+const BLINK_SLOWMO_SCALE: float = 0.45
+const BLINK_SLOWMO_DURATION: float = 0.35
+const HIT_REPOSITION_DISTANCE: float = 2.0
 
 # State tracking
 var current_attack: int = 0
@@ -45,6 +48,9 @@ var can_combo: bool = false
 var last_hit_enemy: Node3D = null
 var blink_target: Node3D = null
 var combo_decay_timer: float = 0.0
+var blink_slowmo_end_time: float = 0.0
+var blink_slowmo_active: bool = false
+var hit_reposition_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 # Dash state
 var dash_direction: Vector3 = Vector3.ZERO
@@ -56,6 +62,7 @@ func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	add_to_group("player")
 	hitbox.hit_detected.connect(_on_hitbox_hit)
+	hit_reposition_rng.randomize()
 	
 	# Initialize from GameState
 	_sync_from_game_state()
@@ -224,6 +231,7 @@ func _perform_blink() -> void:
 	
 	AudioManager.play_sfx("blink")
 	blink_performed.emit(blink_target)
+	_trigger_blink_slowmo()
 	
 	# Extend combo timer if we have the upgrade
 	var combo_extend = UpgradeManager.get_upgrade_effect("combo_keeper", "blink_extends_combo", 0.0)
@@ -235,6 +243,37 @@ func _perform_blink() -> void:
 		GameState.add_combo(1)
 	
 	is_blinking = false
+
+
+func _trigger_blink_slowmo() -> void:
+	if BLINK_SLOWMO_SCALE >= 1.0:
+		return
+	
+	var now = Time.get_ticks_msec() / 1000.0
+	blink_slowmo_end_time = max(blink_slowmo_end_time, now + BLINK_SLOWMO_DURATION)
+	
+	if blink_slowmo_active:
+		return
+	
+	blink_slowmo_active = true
+	Engine.time_scale = BLINK_SLOWMO_SCALE
+	_restore_time_scale()
+
+
+func _restore_time_scale() -> void:
+	while is_inside_tree():
+		var now = Time.get_ticks_msec() / 1000.0
+		if now >= blink_slowmo_end_time:
+			break
+		await get_tree().process_frame
+	
+	Engine.time_scale = 1.0
+	blink_slowmo_active = false
+
+
+func _exit_tree() -> void:
+	if Engine.time_scale != 1.0:
+		Engine.time_scale = 1.0
 
 
 func _perform_dash() -> void:
@@ -312,6 +351,33 @@ func _on_hitbox_hit(target: Node3D) -> void:
 		EffectManager.spawn_hit_effect(target.global_position + Vector3.UP)
 		AudioManager.play_sfx("hit_enemy")
 		attack_hit.emit(target)
+		_move_random_on_hit(target)
+
+
+func _move_random_on_hit(hit_target: Node3D) -> void:
+	if hit_target == null or not is_instance_valid(hit_target):
+		return
+	
+	var basis = hit_target.global_transform.basis
+	var options = [
+		basis.z,
+		-basis.x,
+		basis.x
+	]
+	var direction = options[hit_reposition_rng.randi_range(0, options.size() - 1)]
+	direction.y = 0
+	if direction.length() <= 0.001:
+		direction = global_position - hit_target.global_position
+		direction.y = 0
+	
+	if direction.length() <= 0.001:
+		direction = Vector3(0, 0, 1)
+	
+	direction = direction.normalized()
+	var new_position = hit_target.global_position + direction * HIT_REPOSITION_DISTANCE
+	new_position.y = global_position.y
+	global_position = new_position
+	look_at(hit_target.global_position, Vector3.UP)
 
 
 func take_damage(amount: int) -> void:

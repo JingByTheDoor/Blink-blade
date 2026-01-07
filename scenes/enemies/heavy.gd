@@ -4,10 +4,11 @@ class_name EnemyHeavy
 
 func _ready() -> void:
 	max_health = 100
-	move_speed = 2.5
+	move_speed = 1.8
 	attack_damage = 35
 	attack_range = 2.5
-	attack_cooldown = 2.0
+	attack_cooldown = 2.8
+	attack_windup_time = 0.6
 	super._ready()
 
 
@@ -15,21 +16,20 @@ func _perform_attack() -> void:
 	is_attacking = true
 	attack_timer = attack_cooldown
 	
-	# Wind-up before attack (telegraphing)
-	if not get_tree():
-		return
-	await get_tree().create_timer(0.5).timeout
-	
+	_play_attack_tilt(attack_windup_tilt_degrees, attack_tilt_time)
+	var indicator = await _telegraph_attack()
 	if is_dead or not is_instance_valid(self):
 		return
 	
-	# Heavy slam attack
-	if target and is_instance_valid(target):
-		var distance = global_position.distance_to(target.global_position)
-		if distance <= attack_range:
-			if target.has_method("take_damage"):
-				target.take_damage(attack_damage)
-				AudioManager.play_sfx("hit_player")
+	_play_attack_tilt(attack_swing_tilt_degrees, attack_tilt_time)
+	_spawn_attack_swing_arc()
+	var hit = _apply_attack_damage()
+	if hit:
+		AudioManager.play_sfx("hit_player")
+	if indicator and is_instance_valid(indicator):
+		if hit:
+			await _flash_attack_indicator(indicator)
+		indicator.queue_free()
 	
 	if get_tree():
 		await get_tree().create_timer(0.5).timeout

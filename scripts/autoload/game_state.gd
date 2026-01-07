@@ -49,6 +49,7 @@ var total_enemies_killed: int = 0
 var run_start_time: float = 0.0
 var run_time: float = 0.0
 var is_run_active: bool = false
+var debug_infinite_health: bool = false
 
 # Room definitions
 var room_sequence: Array[String] = [
@@ -128,6 +129,8 @@ func reset_combo(from_damage: bool = false) -> void:
 
 
 func take_damage(amount: int) -> void:
+	if debug_infinite_health:
+		return
 	current_health -= amount
 	current_health = max(0, current_health)
 	took_damage_this_room = true

@@ -4,8 +4,9 @@ class_name EnemyGrunt
 
 func _ready() -> void:
 	max_health = 30
-	move_speed = 6.0
+	move_speed = 4.5
 	attack_damage = 15
 	attack_range = 1.5
-	attack_cooldown = 1.0
+	attack_cooldown = 1.6
+	attack_windup_time = 0.25
 	super._ready()

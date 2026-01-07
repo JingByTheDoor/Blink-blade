@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://room04base"]
+[gd_scene load_steps=10 format=3 uid="uid://room04base"]
 
 [ext_resource type="Script" path="res://scenes/rooms/combat_room.gd" id="1_combat"]
 [ext_resource type="Script" path="res://scenes/main/game_manager.gd" id="2_manager"]
 [ext_resource type="PackedScene" uid="uid://bgrunt1234567" path="res://scenes/enemies/grunt.tscn" id="3_grunt"]
 [ext_resource type="PackedScene" uid="uid://bheavy1234567" path="res://scenes/enemies/heavy.tscn" id="4_heavy"]
+[ext_resource type="PackedScene" uid="uid://branger123456" path="res://scenes/enemies/ranger.tscn" id="5_ranger"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
 size = Vector3(35, 1, 35)
@@ -92,3 +93,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -10)
 
 [node name="Grunt3" parent="Enemies" instance=ExtResource("3_grunt")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -10)
+
+[node name="Ranger1" parent="Enemies" instance=ExtResource("5_ranger")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -14)

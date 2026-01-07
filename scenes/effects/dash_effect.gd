@@ -10,6 +10,9 @@ func _ready() -> void:
 	if trail and trail.get_active_material(0):
 		var mat = trail.get_active_material(0) as StandardMaterial3D
 		if mat:
+			# Duplicate to avoid mutating the shared resource for future instances.
+			mat = mat.duplicate()
+			trail.set_surface_override_material(0, mat)
 			var tween = create_tween()
 			tween.tween_property(mat, "albedo_color:a", 0.0, 0.3)
 	

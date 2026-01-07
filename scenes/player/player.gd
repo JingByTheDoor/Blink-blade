@@ -13,6 +13,7 @@ signal died()
 @onready var mesh: MeshInstance3D = $Mesh
 @onready var hitbox: Hitbox = $Hitbox
 @onready var blink_target_indicator: Node3D = $BlinkTargetIndicator
+@onready var blink_indicator_mesh: MeshInstance3D = $BlinkTargetIndicator/MeshInstance3D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var state_machine: StateMachine = $StateMachine
 
@@ -32,8 +33,20 @@ const COMBO_WINDOW: float = 0.5
 const ATTACK_DURATION: float = 0.3
 const ATTACK_COOLDOWN: float = 0.1
 const BLINK_SLOWMO_SCALE: float = 0.45
-const BLINK_SLOWMO_DURATION: float = 0.35
+const BLINK_SLOWMO_DURATION: float = 0.46
 const HIT_REPOSITION_DISTANCE: float = 2.0
+const HIT_REPOSITION_DURATION: float = 0.12
+const ATTACK_CHOREO_DISTANCE: float = 0.9
+const ATTACK_CHOREO_LUNGE_TIME: float = 0.1
+const ATTACK_CHOREO_RECOVER_TIME: float = 0.12
+const ATTACK_CHOREO_SIDE_ANGLE: float = 18.0
+const ATTACK_SLASH_OFFSET: float = 1.1
+const ATTACK_SLASH_HEIGHT: float = 1.1
+const BLINK_AURA_RADIUS: float = 1.6
+const BLINK_AURA_HEIGHT: float = 0.12
+const BLINK_AURA_OPACITY: float = 0.55
+const BLINK_AURA_COLOR: Color = Color(0.2, 0.6, 1.0, 1.0)
+const BLINK_AURA_EMISSION: float = 1.4
 
 # State tracking
 var current_attack: int = 0
@@ -51,6 +64,10 @@ var combo_decay_timer: float = 0.0
 var blink_slowmo_end_time: float = 0.0
 var blink_slowmo_active: bool = false
 var hit_reposition_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var hit_reposition_tween: Tween = null
+var is_hit_repositioning: bool = false
+var attack_choreo_tween: Tween = null
+var is_attack_choreographing: bool = false
 
 # Dash state
 var dash_direction: Vector3 = Vector3.ZERO
@@ -63,6 +80,7 @@ func _ready() -> void:
 	add_to_group("player")
 	hitbox.hit_detected.connect(_on_hitbox_hit)
 	hit_reposition_rng.randomize()
+	_setup_blink_target_indicator()
 	
 	# Initialize from GameState
 	_sync_from_game_state()
@@ -104,6 +122,9 @@ func _physics_process(delta: float) -> void:
 		_process_dash(delta)
 	elif is_blinking:
 		pass  # Blink is instant
+	elif is_hit_repositioning or is_attack_choreographing:
+		velocity = Vector3.ZERO
+		_process_combat_input()
 	else:
 		_process_movement(delta)
 		_process_combat_input()
@@ -181,6 +202,8 @@ func _perform_attack() -> void:
 	
 	hitbox.activate(damage)
 	AudioManager.play_sfx("attack_" + str(current_attack))
+	_play_attack_choreography()
+	_spawn_attack_slash()
 	
 	# Play attack animation
 	var anim_name = "attack_" + str(current_attack)
@@ -315,7 +338,7 @@ func _update_blink_target() -> void:
 	if blink_target_indicator:
 		if blink_target != null and blink_cooldown_timer <= 0:
 			blink_target_indicator.visible = true
-			blink_target_indicator.global_position = blink_target.global_position + Vector3.UP * 2
+			blink_target_indicator.global_position = blink_target.global_position + Vector3.UP * BLINK_AURA_HEIGHT
 		else:
 			blink_target_indicator.visible = false
 
@@ -376,8 +399,97 @@ func _move_random_on_hit(hit_target: Node3D) -> void:
 	direction = direction.normalized()
 	var new_position = hit_target.global_position + direction * HIT_REPOSITION_DISTANCE
 	new_position.y = global_position.y
-	global_position = new_position
-	look_at(hit_target.global_position, Vector3.UP)
+	_start_hit_reposition(new_position, hit_target)
+
+
+func _start_hit_reposition(new_position: Vector3, look_target: Node3D) -> void:
+	if hit_reposition_tween:
+		hit_reposition_tween.kill()
+	if attack_choreo_tween:
+		attack_choreo_tween.kill()
+		is_attack_choreographing = false
+	
+	is_hit_repositioning = true
+	hit_reposition_tween = create_tween()
+	hit_reposition_tween.tween_property(self, "global_position", new_position, HIT_REPOSITION_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	hit_reposition_tween.tween_callback(func():
+		is_hit_repositioning = false
+		if look_target and is_instance_valid(look_target):
+			look_at(look_target.global_position, Vector3.UP)
+	)
+
+
+func _play_attack_choreography() -> void:
+	if not is_on_floor():
+		return
+	if is_hit_repositioning:
+		return
+	if attack_choreo_tween:
+		attack_choreo_tween.kill()
+	
+	var base_dir = _get_attack_direction()
+	var angle = 0.0
+	if current_attack == 1:
+		angle = -ATTACK_CHOREO_SIDE_ANGLE
+	elif current_attack == 2:
+		angle = ATTACK_CHOREO_SIDE_ANGLE
+	
+	var move_dir = base_dir.rotated(Vector3.UP, deg_to_rad(angle))
+	var start_position = global_position
+	var target_position = global_position + move_dir * ATTACK_CHOREO_DISTANCE
+	target_position.y = global_position.y
+	
+	is_attack_choreographing = true
+	attack_choreo_tween = create_tween()
+	attack_choreo_tween.tween_property(self, "global_position", target_position, ATTACK_CHOREO_LUNGE_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	attack_choreo_tween.tween_property(self, "global_position", start_position, ATTACK_CHOREO_RECOVER_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	attack_choreo_tween.tween_callback(func():
+		is_attack_choreographing = false
+	)
+
+
+func _spawn_attack_slash() -> void:
+	var dir = _get_attack_direction()
+	var pos = global_position + Vector3.UP * ATTACK_SLASH_HEIGHT + dir * ATTACK_SLASH_OFFSET
+	EffectManager.spawn_slash_effect(pos, dir)
+
+
+func _get_attack_direction() -> Vector3:
+	var dir = Vector3.ZERO
+	if blink_target and is_instance_valid(blink_target):
+		dir = blink_target.global_position - global_position
+		dir.y = 0
+	
+	if dir.length() <= 0.001:
+		dir = -global_transform.basis.z
+		dir.y = 0
+	
+	if dir.length() <= 0.001:
+		dir = Vector3(0, 0, -1)
+	
+	return dir.normalized()
+
+
+func _setup_blink_target_indicator() -> void:
+	if not blink_indicator_mesh:
+		return
+	
+	var ring_mesh := CylinderMesh.new()
+	ring_mesh.top_radius = BLINK_AURA_RADIUS
+	ring_mesh.bottom_radius = BLINK_AURA_RADIUS
+	ring_mesh.height = 0.05
+	ring_mesh.radial_segments = 32
+	blink_indicator_mesh.mesh = ring_mesh
+	blink_indicator_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(BLINK_AURA_COLOR.r, BLINK_AURA_COLOR.g, BLINK_AURA_COLOR.b, BLINK_AURA_OPACITY)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.emission_enabled = true
+	mat.emission = BLINK_AURA_COLOR
+	mat.emission_energy_multiplier = BLINK_AURA_EMISSION
+	blink_indicator_mesh.material_override = mat
 
 
 func take_damage(amount: int) -> void:

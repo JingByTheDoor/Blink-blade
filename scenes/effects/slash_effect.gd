@@ -14,6 +14,9 @@ func _ready() -> void:
 		
 		var mat = mesh.get_active_material(0) as StandardMaterial3D
 		if mat:
+			# Duplicate to avoid mutating the shared resource for future instances.
+			mat = mat.duplicate()
+			mesh.set_surface_override_material(0, mat)
 			tween.tween_property(mat, "albedo_color:a", 0.0, 0.2)
 	
 	# Self destruct

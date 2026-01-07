@@ -36,10 +36,8 @@ const BLINK_SLOWMO_SCALE: float = 0.45
 const BLINK_SLOWMO_DURATION: float = 0.46
 const HIT_REPOSITION_DISTANCE: float = 2.0
 const HIT_REPOSITION_DURATION: float = 0.12
-const ATTACK_CHOREO_DISTANCE: float = 0.9
-const ATTACK_CHOREO_LUNGE_TIME: float = 0.1
-const ATTACK_CHOREO_RECOVER_TIME: float = 0.12
-const ATTACK_CHOREO_SIDE_ANGLE: float = 18.0
+const ATTACK_STAB_DISTANCE: float = 0.7
+const ATTACK_STAB_TIME: float = 0.08
 const ATTACK_SLASH_OFFSET: float = 1.1
 const ATTACK_SLASH_HEIGHT: float = 1.1
 const BLINK_AURA_RADIUS: float = 1.6
@@ -428,21 +426,13 @@ func _play_attack_choreography() -> void:
 		attack_choreo_tween.kill()
 	
 	var base_dir = _get_attack_direction()
-	var angle = 0.0
-	if current_attack == 1:
-		angle = -ATTACK_CHOREO_SIDE_ANGLE
-	elif current_attack == 2:
-		angle = ATTACK_CHOREO_SIDE_ANGLE
-	
-	var move_dir = base_dir.rotated(Vector3.UP, deg_to_rad(angle))
-	var start_position = global_position
-	var target_position = global_position + move_dir * ATTACK_CHOREO_DISTANCE
+	var move_dir = base_dir
+	var target_position = global_position + move_dir * ATTACK_STAB_DISTANCE
 	target_position.y = global_position.y
 	
 	is_attack_choreographing = true
 	attack_choreo_tween = create_tween()
-	attack_choreo_tween.tween_property(self, "global_position", target_position, ATTACK_CHOREO_LUNGE_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	attack_choreo_tween.tween_property(self, "global_position", start_position, ATTACK_CHOREO_RECOVER_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	attack_choreo_tween.tween_property(self, "global_position", target_position, ATTACK_STAB_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	attack_choreo_tween.tween_callback(func():
 		is_attack_choreographing = false
 	)

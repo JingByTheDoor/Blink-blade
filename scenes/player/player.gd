@@ -418,24 +418,8 @@ func _start_hit_reposition(new_position: Vector3, look_target: Node3D) -> void:
 
 
 func _play_attack_choreography() -> void:
-	if not is_on_floor():
-		return
-	if is_hit_repositioning:
-		return
-	if attack_choreo_tween:
-		attack_choreo_tween.kill()
-	
-	var base_dir = _get_attack_direction()
-	var move_dir = base_dir
-	var target_position = global_position + move_dir * ATTACK_STAB_DISTANCE
-	target_position.y = global_position.y
-	
-	is_attack_choreographing = true
-	attack_choreo_tween = create_tween()
-	attack_choreo_tween.tween_property(self, "global_position", target_position, ATTACK_STAB_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	attack_choreo_tween.tween_callback(func():
-		is_attack_choreographing = false
-	)
+	# Attack movement disabled
+	pass
 
 
 func _spawn_attack_slash() -> void:
@@ -445,14 +429,9 @@ func _spawn_attack_slash() -> void:
 
 
 func _get_attack_direction() -> Vector3:
-	var dir = Vector3.ZERO
-	if blink_target and is_instance_valid(blink_target):
-		dir = blink_target.global_position - global_position
-		dir.y = 0
-	
-	if dir.length() <= 0.001:
-		dir = -global_transform.basis.z
-		dir.y = 0
+	# Always attack in the direction the player is facing
+	var dir = -global_transform.basis.z
+	dir.y = 0
 	
 	if dir.length() <= 0.001:
 		dir = Vector3(0, 0, -1)
